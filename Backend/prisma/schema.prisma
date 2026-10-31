@@ -1,0 +1,340 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// DEPARTMENT
+// ==========================================
+
+model Department {
+  code            String           @id
+  name            String?
+  faculty         Faculty[]
+  courses         Course[]
+  studentGroups   StudentGroup[]
+  users           User[]
+  bookingRequests BookingRequest[]
+}
+
+// ==========================================
+// USER / AUTHENTICATION
+// ==========================================
+
+model User {
+  id             String  @id @default(uuid())
+  name           String
+  email          String  @unique
+  passwordHash   String
+  role           String  @default("FACULTY")
+  departmentCode String?
+  facultyId      String? @unique
+  isActive       Boolean @default(true)
+
+  department Department? @relation(fields: [departmentCode], references: [code])
+  faculty    Faculty?    @relation(fields: [facultyId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentCode])
+  @@index([role])
+}
+
+// ==========================================
+// FACULTY
+// ==========================================
+
+model Faculty {
+  id              String  @id
+  name            String
+  departmentCode  String
+  maxHoursPerDay  Int
+  needsAccessible Boolean
+
+  unavailable Json
+  preferences Json
+
+  department Department        @relation(fields: [departmentCode], references: [code])
+  sessions   TeachingSession[]
+  user       User?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentCode])
+}
+
+// ==========================================
+// COURSE
+// ==========================================
+
+model Course {
+  id             String @id
+  title          String
+  departmentCode String
+  year           Int
+  lectureHours   Int
+  tutorialHours  Int
+  labBlocks      Int
+
+  department  Department        @relation(fields: [departmentCode], references: [code])
+  sessions    TeachingSession[]
+  examCourses ExamCourse[]
+
+  @@index([departmentCode, year])
+}
+
+// ==========================================
+// STUDENT GROUP
+// ==========================================
+
+model StudentGroup {
+  id              String  @id
+  name            String
+  year            Int
+  departmentCode  String
+  size            Int
+  needsAccessible Boolean
+
+  department Department @relation(fields: [departmentCode], references: [code])
+
+  sessionGroups     SessionGroup[]
+  examGroups        ExamGroup[]
+  mandatoryBookings BookingMandatoryGroup[]
+
+  @@index([departmentCode, year])
+}
+
+// ==========================================
+// ROOM
+// ==========================================
+
+model Room {
+  id          String   @id
+  name        String
+  building    String
+  type        String
+  capacity    Int
+  features    String[]
+  accessible  Boolean
+  allowedUses String[]
+
+  unavailabilities  RoomUnavailability[]
+  requestedBookings BookingRequest[]     @relation("RequestedRoom")
+  scheduledSessions ScheduledSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([capacity])
+}
+
+// ==========================================
+// TEACHING SESSION
+// ==========================================
+
+model TeachingSession {
+  id              String   @id
+  courseId        String
+  kind            String
+  facultyId       String
+  size            Int
+  duration        Int
+  roomTypes       String[]
+  needsAccessible Boolean
+  basketSlot      String?
+  fixedSlot       Json?
+
+  course  Course  @relation(fields: [courseId], references: [id])
+  faculty Faculty @relation(fields: [facultyId], references: [id])
+
+  groups    SessionGroup[]
+  scheduled ScheduledSession[]
+
+  @@index([courseId])
+  @@index([facultyId])
+  @@index([kind])
+}
+
+// ==========================================
+// SESSION - STUDENT GROUP RELATION
+// ==========================================
+
+model SessionGroup {
+  sessionId String
+  groupId   String
+
+  session TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  group   StudentGroup    @relation(fields: [groupId], references: [id])
+
+  @@id([sessionId, groupId])
+  @@index([groupId])
+}
+
+// ==========================================
+// EXAMINATION
+// ==========================================
+
+model Exam {
+  id            String @id
+  size          Int
+  durationHours Int
+
+  courses ExamCourse[]
+  groups  ExamGroup[]
+
+  @@index([size])
+}
+
+// ==========================================
+// EXAM - COURSE RELATION
+// ==========================================
+
+model ExamCourse {
+  examId   String
+  courseId String
+
+  exam   Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@id([examId, courseId])
+}
+
+// ==========================================
+// EXAM - STUDENT GROUP RELATION
+// ==========================================
+
+model ExamGroup {
+  examId  String
+  groupId String
+
+  exam  Exam         @relation(fields: [examId], references: [id], onDelete: Cascade)
+  group StudentGroup @relation(fields: [groupId], references: [id])
+
+  @@id([examId, groupId])
+  @@index([groupId])
+}
+
+// ==========================================
+// ROOM UNAVAILABILITY
+// ==========================================
+
+model RoomUnavailability {
+  id      String @id @default(uuid())
+  roomId  String
+  day     String
+  periods Int[]
+  reason  String
+
+  room Room @relation(fields: [roomId], references: [id])
+
+  @@index([roomId, day])
+}
+
+// ==========================================
+// BOOKING REQUEST
+// ==========================================
+
+model BookingRequest {
+  id                String   @id
+  submittedAt       DateTime @db.Timestamptz(3)
+  requester         String
+  role              String
+  departmentCode    String?
+  requestedCategory String
+  title             String
+  attendance        Int
+  durationPeriods   Int
+
+  windows   Json
+  roomTypes String[]
+  needs     String[]
+
+  requestedRoomId String?
+  seriesId        String?
+  rawText         String
+
+  department    Department? @relation(fields: [departmentCode], references: [code])
+  requestedRoom Room?       @relation("RequestedRoom", fields: [requestedRoomId], references: [id])
+
+  mandatoryGroups BookingMandatoryGroup[]
+  cancellation    Cancellation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([requestedCategory])
+  @@index([submittedAt])
+  @@index([departmentCode])
+}
+
+// ==========================================
+// BOOKING - MANDATORY GROUP RELATION
+// ==========================================
+
+model BookingMandatoryGroup {
+  bookingRequestId String
+  groupId          String
+
+  bookingRequest BookingRequest @relation(fields: [bookingRequestId], references: [id], onDelete: Cascade)
+  group          StudentGroup   @relation(fields: [groupId], references: [id])
+
+  @@id([bookingRequestId, groupId])
+}
+
+// ==========================================
+// CANCELLATION
+// ==========================================
+
+model Cancellation {
+  id          String   @id @default(uuid())
+  requestId   String   @unique
+  cancelledAt DateTime @db.Timestamptz(3)
+  by          String
+  note        String
+
+  bookingRequest BookingRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// GENERATED SCHEDULE
+// ==========================================
+
+model Schedule {
+  id          String   @id @default(uuid())
+  name        String
+  version     Int      @default(1)
+  status      String   @default("DRAFT")
+  generatedAt DateTime @default(now())
+
+  sessions ScheduledSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// SCHEDULED SESSION
+// ==========================================
+
+model ScheduledSession {
+  id          String @id @default(uuid())
+  scheduleId  String
+  sessionId   String
+  roomId      String
+  day         String
+  startPeriod Int
+  endPeriod   Int
+
+  schedule Schedule        @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  session  TeachingSession @relation(fields: [sessionId], references: [id])
+  room     Room            @relation(fields: [roomId], references: [id])
+
+  @@unique([scheduleId, sessionId])
+  @@index([scheduleId, roomId, day])
+}
