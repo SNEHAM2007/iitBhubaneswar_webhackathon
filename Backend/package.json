@@ -2,7 +2,8 @@
   "name": "campus-scheduling-backend",
   "version": "1.0.0",
   "description": "Backend for Campus Scheduling and Venue Management System",
-  "main": "server.js",
+  "main": "src/server.js",
+  "type": "module",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
@@ -29,6 +30,5 @@
   "devDependencies": {
     "nodemon": "^3.1.14",
     "prisma": "^7.10.1"
-  },
-  "type": "module"
+  }
 }
