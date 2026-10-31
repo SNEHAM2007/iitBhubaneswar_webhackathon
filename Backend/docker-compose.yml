@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: campus-scheduler-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: campus123
+      POSTGRES_DB: campus_scheduler
+    ports:
+      - "5433:5432"
+    volumes:
+      - campus_scheduler_pgdata:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    container_name: campus-scheduler-adminer
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  campus_scheduler_pgdata:
+    name: campus_scheduler_pgdata
