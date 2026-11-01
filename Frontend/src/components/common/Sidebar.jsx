@@ -10,7 +10,6 @@ import
         Bot,
         Building2,
         Users,
-        Settings,
         X,
     } from "lucide-react";
 
@@ -53,7 +52,7 @@ const navigation = {
     ],
 };
 
-function Sidebar({ open = true, onClose })
+function Sidebar({ isOpen = true, onClose })
 {
     const { user, logout } = useAuth();
 
@@ -62,7 +61,7 @@ function Sidebar({ open = true, onClose })
 
     return (
         <>
-            {open && (
+            {isOpen && (
                 <div
                     className="fixed inset-0 z-40 bg-slate-950/40 lg:hidden"
                     onClick={onClose}
@@ -70,7 +69,7 @@ function Sidebar({ open = true, onClose })
             )}
 
             <aside
-                className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"
+                className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 <div className="flex h-20 items-center justify-between border-b border-slate-100 px-5">

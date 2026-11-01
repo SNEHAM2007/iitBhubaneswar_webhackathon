@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import
-    {
-        Bot,
-        Send,
-        User,
-        Sparkles,
-        CalendarDays,
-        DoorOpen,
-        Clock,
-    } from "lucide-react";
+import {
+    Bot,
+    Send,
+    User,
+    Sparkles,
+    CalendarDays,
+    DoorOpen,
+    Clock,
+} from "lucide-react";
+import { sendChatMessage } from "../services/assistant";
 
 const suggestions = [
     "Find an available classroom tomorrow",
@@ -24,7 +24,7 @@ function Assistant()
             id: 1,
             role: "assistant",
             content:
-                "Hello! I'm your Campus Scheduling Assistant. I can help you with timetables, room availability, bookings and scheduling questions. How can I help you?",
+                "Hello! I'm your Campus Scheduling Assistant. I can help you with timetables, room availability, bookings, examinations and conflict checks. How can I help you today?",
         },
     ]);
 
@@ -55,8 +55,24 @@ function Assistant()
         setInput("");
         setLoading(true);
 
-        // AI backend integration will be added later.
-        setTimeout(() =>
+        try
+        {
+            const response = await sendChatMessage(message);
+            const replyContent =
+                response?.reply ||
+                response?.message ||
+                "I have processed your query. Please check the corresponding section in the navigation menu.";
+
+            setMessages((previous) => [
+                ...previous,
+                {
+                    id: Date.now() + 1,
+                    role: "assistant",
+                    content: replyContent,
+                },
+            ]);
+        }
+        catch (err)
         {
             setMessages((previous) => [
                 ...previous,
@@ -64,12 +80,14 @@ function Assistant()
                     id: Date.now() + 1,
                     role: "assistant",
                     content:
-                        "Your request has been received. AI scheduling integration will be connected to the backend in the next development step.",
+                        "Sorry, I couldn't connect to the campus assistant service right now. Please ensure the backend is running.",
                 },
             ]);
-
+        }
+        finally
+        {
             setLoading(false);
-        }, 800);
+        }
     };
 
     return (
@@ -87,7 +105,7 @@ function Assistant()
 
                     <p className="text-xs text-emerald-600">
                         <Sparkles size={12} className="mr-1 inline" />
-                        English and Hinglish support
+                        Live Campus Knowledge & Conflict Assistant
                     </p>
                 </div>
             </div>
@@ -116,7 +134,7 @@ function Assistant()
                         </div>
 
                         <div
-                            className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-6 ${message.role === "user"
+                            className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-6 ${message.role === "user"
                                     ? "rounded-tr-sm bg-indigo-600 text-white"
                                     : "rounded-tl-sm border border-slate-200 bg-white text-slate-700"
                                 }`}
@@ -133,7 +151,7 @@ function Assistant()
                         </div>
 
                         <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500">
-                            Assistant is thinking...
+                            Assistant is analyzing campus data...
                         </div>
                     </div>
                 )}

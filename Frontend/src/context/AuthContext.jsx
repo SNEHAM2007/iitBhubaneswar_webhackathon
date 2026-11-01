@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useContext,
@@ -24,7 +23,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
 
       const response = await loginUser(credentials);
-
       const loggedInUser = response.user || response.data?.user;
 
       if (!loggedInUser) {
@@ -49,8 +47,6 @@ export const AuthProvider = ({ children }) => {
       if (!registeredUser) {
         throw new Error("User information was not returned by the server");
       }
-
-      setUser(registeredUser);
 
       return registeredUser;
     } finally {
@@ -83,8 +79,10 @@ export const useAuth = () => {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
+    throw new Error("useAuth must be used within an AuthProvider");
   }
 
   return context;
 };
+
+export default AuthContext;

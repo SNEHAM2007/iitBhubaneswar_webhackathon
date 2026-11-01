@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     AlertCircle,
     BookOpen,
@@ -16,7 +16,7 @@ import {
 import TimetableGrid from "../components/timetable/TimetableGrid";
 import TimetableFilters from "../components/timetable/TimetableFilter";
 import TimetableDetails from "../components/timetable/TimetableDetails";
-import { generateTimetable } from "../services/scheduling";
+import { generateTimetable, getLatestTimetable } from "../services/scheduling";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -32,7 +32,40 @@ function Timetable()
     const [solverStatus, setSolverStatus] = useState("");
     const [lastGenerated, setLastGenerated] = useState(null);
     const [generating, setGenerating] = useState(false);
+    const [initialLoading, setInitialLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const loadSchedule = useCallback(async () =>
+    {
+        try
+        {
+            setInitialLoading(true);
+            const result = await getLatestTimetable();
+
+            if (Array.isArray(result?.timetable) && result.timetable.length > 0)
+            {
+                setEntries(result.timetable);
+                setSolverStatus(result.solver_status || "OPTIMAL");
+                if (result.generatedAt)
+                {
+                    setLastGenerated(new Date(result.generatedAt));
+                }
+            }
+        }
+        catch (requestError)
+        {
+            console.warn("Could not load initial timetable:", requestError);
+        }
+        finally
+        {
+            setInitialLoading(false);
+        }
+    }, []);
+
+    useEffect(() =>
+    {
+        loadSchedule();
+    }, [loadSchedule]);
 
     const departments = useMemo(
         () => [...new Set(entries.map((entry) => entry.department))].sort(),
@@ -190,7 +223,7 @@ function Timetable()
                     <button
                         type="button"
                         onClick={handleGenerate}
-                        disabled={generating}
+                        disabled={generating || initialLoading}
                         className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-indigo-950 shadow-md transition hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-70"
                     >
                         {generating ? (
@@ -201,8 +234,8 @@ function Timetable()
                         {generating
                             ? "Building your schedule..."
                             : entries.length
-                              ? "Regenerate schedule"
-                              : "Generate schedule"}
+                                ? "Regenerate schedule"
+                                : "Generate schedule"}
                     </button>
                 </div>
             </section>
@@ -313,7 +346,14 @@ function Timetable()
                     </div>
                 )}
 
-                {!entries.length ? (
+                {initialLoading ? (
+                    <div className="px-6 py-16 text-center sm:py-20">
+                        <RefreshCw size={28} className="mx-auto animate-spin text-indigo-600" />
+                        <h3 className="mt-4 font-semibold text-slate-800">
+                            Loading campus timetable...
+                        </h3>
+                    </div>
+                ) : !entries.length ? (
                     <div className="px-6 py-16 text-center sm:py-20">
                         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
                             {generating

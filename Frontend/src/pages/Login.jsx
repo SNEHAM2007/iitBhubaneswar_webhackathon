@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ArrowRight, CheckCircle2, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import { useAuth } from "../context/AuthContext";
@@ -14,13 +14,27 @@ const dashboardRoutes = {
 
 function Login()
 {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { login, loading } = useAuth();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
-    const navigate = useNavigate();
-    const { login, loading } = useAuth();
+    useEffect(() =>
+    {
+        if (location.state?.email)
+        {
+            setEmail(location.state.email);
+        }
+        if (location.state?.message)
+        {
+            setSuccessMessage(location.state.message);
+        }
+    }, [location.state]);
 
     const handleSubmit = async (event) =>
     {
@@ -30,7 +44,7 @@ function Login()
         try
         {
             const loggedInUser = await login({
-                email: email.trim(),
+                email: email.trim().toLowerCase(),
                 password,
             });
             const destination = dashboardRoutes[loggedInUser.role?.toUpperCase()];
@@ -64,6 +78,16 @@ function Login()
                 </p>
             </div>
 
+            {successMessage && (
+                <div
+                    role="status"
+                    className="mb-5 flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-sm font-semibold text-emerald-800"
+                >
+                    <CheckCircle2 size={19} className="shrink-0 text-emerald-600" />
+                    <span>{successMessage}</span>
+                </div>
+            )}
+
             {error && (
                 <div
                     role="alert"
@@ -88,7 +112,7 @@ function Login()
                             type="email"
                             value={email}
                             onChange={(event) => setEmail(event.target.value)}
-                            placeholder="you@college.edu"
+                            placeholder="you@cit.edu"
                             className="min-w-0 flex-1 bg-transparent px-3 py-3.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"
                             autoComplete="email"
                             autoCapitalize="none"
@@ -141,7 +165,7 @@ function Login()
 
             <div className="my-7 flex items-center gap-3">
                 <span className="h-px flex-1 bg-slate-200" />
-                <span className="text-xs text-slate-400">New to Campus Scheduler?</span>
+                <span className="text-xs text-slate-400">New user?</span>
                 <span className="h-px flex-1 bg-slate-200" />
             </div>
 
@@ -149,12 +173,11 @@ function Login()
                 to="/register"
                 className="flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
             >
-                Create a faculty account
+                Create a new account
             </Link>
 
             <p className="mt-5 text-center text-xs leading-5 text-slate-500">
-                Sign-in access for all four roles. Your dashboard is selected
-                automatically from your account.
+                Sign-in access for Faculty, Coordinators, Club Reps and Administrators.
             </p>
         </AuthLayout>
     );

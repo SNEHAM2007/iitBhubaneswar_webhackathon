@@ -19,17 +19,9 @@ export const loginUser = async (credentials) => {
   return response.data;
 };
 
+// Register user
 export const registerUser = async (details) => {
   const response = await api.post("/auth/register", details);
-  const { token, user } = response.data;
-
-  if (!token || !user) {
-    throw new Error("Authentication details were not returned by the server");
-  }
-
-  localStorage.setItem("token", token);
-  localStorage.setItem("user", JSON.stringify(user));
-
   return response.data;
 };
 
