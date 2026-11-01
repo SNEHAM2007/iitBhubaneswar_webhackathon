@@ -1,16 +1,22 @@
 
 import { useEffect, useMemo, useState } from "react";
-import { Plus, X, RefreshCw } from "lucide-react";
+import { Plus, X, RefreshCw, Sparkles } from "lucide-react";
 
 import BookingForm from "../components/booking/BookingForm";
 import BookingList from "../components/booking/BookingList";
 import BookingFilters from "../components/booking/BookingFilters";
 import BookingSummary from "../components/booking/BookingSummary";
 
-import { getBookings, createBooking } from "../services/booking";
+import {
+    getBookings,
+    createBooking,
+    parseBookingRequest,
+} from "../services/booking";
+import { useAuth } from "../../context/AuthContext";
 
 function Bookings()
 {
+    const { user } = useAuth();
     const [bookings, setBookings] = useState([]);
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("ALL");
@@ -20,6 +26,11 @@ function Bookings()
     const [error, setError] = useState("");
     const [showForm, setShowForm] = useState(false);
     const [success, setSuccess] = useState("");
+    const [requestText, setRequestText] = useState("");
+    const [parsing, setParsing] = useState(false);
+    const [parseError, setParseError] = useState("");
+    const [parsedBooking, setParsedBooking] = useState(null);
+    const [draftVersion, setDraftVersion] = useState(0);
 
     const loadBookings = async () =>
     {
@@ -103,6 +114,37 @@ function Bookings()
         }
     };
 
+    const handleParseRequest = async (event) =>
+    {
+        event.preventDefault();
+        setParseError("");
+
+        try {
+            setParsing(true);
+            const response = await parseBookingRequest(requestText);
+            const draft = response?.data;
+
+            if (!draft || typeof draft !== "object") {
+                throw new Error("The parser returned an invalid booking draft.");
+            }
+
+            setParsedBooking({
+                ...draft,
+                requester: user?.name || "",
+                departmentCode: user?.departmentCode || "",
+            });
+            setDraftVersion((version) => version + 1);
+        } catch (err) {
+            setParseError(
+                err.response?.data?.message ||
+                err.message ||
+                "Unable to parse the venue request.",
+            );
+        } finally {
+            setParsing(false);
+        }
+    };
+
     const resetFilters = () =>
     {
         setSearch("");
@@ -134,7 +176,13 @@ function Bookings()
 
                     <button
                         type="button"
-                        onClick={() => setShowForm((current) => !current)}
+                        onClick={() =>
+                        {
+                            setShowForm((current) => !current);
+                            setParsedBooking(null);
+                            setRequestText("");
+                            setParseError("");
+                        }}
                         className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
                     >
                         {showForm ? <X size={17} /> : <Plus size={17} />}
@@ -155,9 +203,49 @@ function Bookings()
                         Create Booking Request
                     </h2>
 
+                    <form onSubmit={handleParseRequest} className="mb-6 space-y-3 rounded-xl bg-indigo-50 p-4">
+                        <label htmlFor="booking-request-text" className="block text-sm font-semibold text-slate-800">
+                            Describe the venue request in English or Hinglish
+                        </label>
+                        <textarea
+                            id="booking-request-text"
+                            value={requestText}
+                            onChange={(event) => setRequestText(event.target.value)}
+                            rows={3}
+                            maxLength={4000}
+                            placeholder="e.g. Thursday shaam 6 baje 2 ghante ke liye seminar hall chahiye, 100 log aur mic ke saath."
+                            className="w-full rounded-xl border border-indigo-100 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500"
+                            required
+                        />
+                        {parseError && (
+                            <p role="alert" className="text-sm text-red-700">{parseError}</p>
+                        )}
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <p className="text-xs text-slate-500">
+                                We’ll prepare a draft. Review and edit every detail before submitting.
+                            </p>
+                            <button
+                                type="submit"
+                                disabled={parsing || !requestText.trim()}
+                                className="flex shrink-0 items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-white px-4 py-2.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 disabled:opacity-60"
+                            >
+                                <Sparkles size={16} />
+                                {parsing ? "Preparing draft..." : "Create editable draft"}
+                            </button>
+                        </div>
+                    </form>
+
+                    {parsedBooking?.followUp && (
+                        <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                            {parsedBooking.followUp}
+                        </p>
+                    )}
+
                     <BookingForm
+                        key={draftVersion}
                         onSubmit={handleCreateBooking}
                         loading={submitting}
+                        initialData={parsedBooking}
                     />
                 </section>
             )}

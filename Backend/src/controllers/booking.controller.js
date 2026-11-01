@@ -4,6 +4,36 @@ import {
   getBookingRequests,
   getBookingRequestById,
 } from "../services/booking.service.js";
+import { parseBookingRequestText } from "../services/bookingParser.service.js";
+
+export const parseBookingRequest = async (req, res) => {
+  const text = typeof req.body?.text === "string" ? req.body.text.trim() : "";
+
+  if (!text || text.length > 4000) {
+    return res.status(400).json({
+      success: false,
+      message: "Enter a request between 1 and 4000 characters.",
+    });
+  }
+
+  try {
+    const draft = await parseBookingRequestText(text);
+    return res.status(200).json({ success: true, data: draft });
+  } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    console.error("Booking request parsing error:", error);
+    return res.status(502).json({
+      success: false,
+      message: "The booking parser is temporarily unavailable.",
+    });
+  }
+};
 
 // Submit a booking request
 export const submitBooking = async (req, res) => {

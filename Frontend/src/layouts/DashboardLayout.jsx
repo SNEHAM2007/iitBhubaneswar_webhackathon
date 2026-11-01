@@ -17,6 +17,7 @@ const pageTitles = {
   "/faculty-management": "Faculty Management",
 };
 
+
 function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();

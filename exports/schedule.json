@@ -1,7 +1,7 @@
 {
     "dataset_id": "cit-public-v1",
     "team": "Campus Scheduler",
-    "generated_at": "2026-11-01T03:18:15.667801+00:00",
+    "generated_at": "2026-11-01T03:45:02.901545+00:00",
     "sessions": [
         {
             "session_id": "MA101-AB-L1",
@@ -1166,7 +1166,7 @@
             "rooms": [
                 "AUD",
                 "LH-1",
-                "CR-201"
+                "SH-2"
             ]
         },
         {
@@ -1176,7 +1176,7 @@
             "rooms": [
                 "AUD",
                 "LH-2",
-                "CR-204"
+                "SH-2"
             ]
         },
         {
@@ -1224,7 +1224,7 @@
             "day": "WED",
             "session": "PM",
             "rooms": [
-                "AUD"
+                "LH-1"
             ]
         },
         {
@@ -1269,10 +1269,10 @@
         },
         {
             "exam_id": "EX-EE204",
-            "day": "TUE",
-            "session": "PM",
+            "day": "FRI",
+            "session": "AM",
             "rooms": [
-                "LH-4"
+                "LH-5"
             ]
         },
         {
@@ -1288,15 +1288,15 @@
             "day": "SAT",
             "session": "AM",
             "rooms": [
-                "LH-4"
+                "SH-1"
             ]
         },
         {
             "exam_id": "EX-ME203",
-            "day": "MON",
-            "session": "AM",
+            "day": "THU",
+            "session": "PM",
             "rooms": [
-                "LH-1"
+                "SH-1"
             ]
         },
         {
@@ -1336,7 +1336,7 @@
             "day": "FRI",
             "session": "AM",
             "rooms": [
-                "LH-6"
+                "SH-2"
             ]
         },
         {
@@ -1353,7 +1353,7 @@
             "day": "THU",
             "session": "AM",
             "rooms": [
-                "LH-1"
+                "AUD"
             ]
         },
         {
@@ -1361,7 +1361,7 @@
             "day": "MON",
             "session": "AM",
             "rooms": [
-                "LH-2"
+                "LH-1"
             ]
         },
         {
@@ -1415,9 +1415,9 @@
         {
             "exam_id": "EX-EE303",
             "day": "THU",
-            "session": "PM",
+            "session": "AM",
             "rooms": [
-                "AUD"
+                "LH-2"
             ]
         },
         {
@@ -1425,7 +1425,7 @@
             "day": "TUE",
             "session": "PM",
             "rooms": [
-                "LH-1"
+                "LH-4"
             ]
         },
         {
@@ -1449,7 +1449,7 @@
             "day": "SAT",
             "session": "PM",
             "rooms": [
-                "CR-102"
+                "CR-101"
             ]
         },
         {
@@ -1457,7 +1457,7 @@
             "day": "TUE",
             "session": "PM",
             "rooms": [
-                "CR-201"
+                "LH-1"
             ]
         },
         {

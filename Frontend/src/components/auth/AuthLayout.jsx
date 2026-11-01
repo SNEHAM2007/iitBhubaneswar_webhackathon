@@ -51,24 +51,49 @@ function AuthLayout({ children, pageLabel })
                     </div>
                 </div>
 
-                <div className="relative my-12 max-w-xl">
+                <div className="relative my-8 max-w-xl">
                     <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-indigo-200">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                         Smarter campus operations
                     </span>
-                    <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
+                    <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
                         A better day on campus starts with a better plan.
                     </h1>
-                    <p className="mt-5 max-w-lg text-base leading-7 text-slate-300">
+                    <p className="mt-4 max-w-lg text-base leading-7 text-slate-300">
                         Keep classes, people and spaces moving together with one
                         connected scheduling workspace.
                     </p>
 
-                    <div className="mt-10 grid gap-3 sm:grid-cols-2">
+                    <figure className="group relative mt-6 overflow-hidden rounded-2xl border border-white/15 bg-slate-900 shadow-2xl shadow-indigo-950/30">
+                        <img
+                            src="/Chilka%20Institute%20Campus%20Banner.png"
+                            alt="Chilika Institute of Technology campus"
+                            className="h-36 w-full object-cover object-center transition duration-700 group-hover:scale-[1.03]"
+                        />
+                        <div
+                            aria-hidden="true"
+                            className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/5 to-transparent"
+                        />
+                        <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
+                            <span>
+                                <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">
+                                    Welcome to
+                                </span>
+                                <span className="mt-1 block text-sm font-bold text-white sm:text-base">
+                                    Chilika Institute of Technology
+                                </span>
+                            </span>
+                            <span className="rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-bold tracking-wider text-white backdrop-blur-sm">
+                                CIT
+                            </span>
+                        </figcaption>
+                    </figure>
+
+                    <div className="mt-6 grid gap-2 sm:grid-cols-2">
                         {roles.map(({ name, description, icon: Icon, color }) => (
                             <div
                                 key={name}
-                                className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4"
+                                className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3"
                             >
                                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${color}`}>
                                     <Icon size={17} />
@@ -85,7 +110,7 @@ function AuthLayout({ children, pageLabel })
                         ))}
                     </div>
 
-                    <div className="mt-5 flex items-center gap-2 text-xs leading-5 text-slate-400">
+                    <div className="mt-4 flex items-center gap-2 text-xs leading-5 text-slate-400">
                         <ShieldCheck size={15} className="shrink-0 text-emerald-300" />
                         Your access is determined by the role assigned to your account.
                     </div>
@@ -106,6 +131,26 @@ function AuthLayout({ children, pageLabel })
                             Campus Scheduler
                         </span>
                     </div>
+
+                    <figure className="group relative mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-lg shadow-indigo-950/10 lg:hidden">
+                        <img
+                            src="/Chilka%20Institute%20Campus%20Banner.png"
+                            alt="Chilika Institute of Technology campus"
+                            className="h-28 w-full object-cover object-center transition duration-700 group-hover:scale-[1.03]"
+                        />
+                        <div
+                            aria-hidden="true"
+                            className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/5 to-transparent"
+                        />
+                        <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-3">
+                            <span className="text-sm font-bold text-white">
+                                Chilika Institute of Technology
+                            </span>
+                            <span className="rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[10px] font-bold tracking-wider text-white backdrop-blur-sm">
+                                CIT
+                            </span>
+                        </figcaption>
+                    </figure>
 
                     <p className="text-sm font-semibold text-indigo-600">
                         {pageLabel}

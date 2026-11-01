@@ -2,22 +2,25 @@
 import { useState } from "react";
 import { CalendarDays, Clock, Users, MapPin, Send } from "lucide-react";
 
-function BookingForm({ onSubmit, onCancel })
+function BookingForm({ onSubmit, onCancel, initialData, loading: parentLoading = false })
 {
-    const [formData, setFormData] = useState({
-        title: "",
-        requester: "",
-        departmentCode: "",
-        requestedCategory: "CLASSROOM",
-        attendance: "",
-        date: "",
-        startTime: "",
-        durationPeriods: "1",
-        requestedRoomId: "",
-        rawText: "",
-    });
+    const [formData, setFormData] = useState(() => ({
+        title: initialData?.title || "",
+        requester: initialData?.requester || "",
+        departmentCode: initialData?.departmentCode || "",
+        requestedCategory: initialData?.requestedCategory || "CLASSROOM",
+        attendance: initialData?.attendance || "",
+        date: initialData?.date || "",
+        startTime: initialData?.startTime || "",
+        durationPeriods: initialData?.durationPeriods || "1",
+        requestedRoomId: initialData?.requestedRoomId || "",
+        roomTypes: initialData?.roomTypes || [],
+        needs: initialData?.needs || [],
+        mandatoryGroupIds: initialData?.mandatoryGroupIds || [],
+        rawText: initialData?.rawText || "",
+    }));
 
-    const [loading, setLoading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const handleChange = (e) =>
     {
@@ -33,15 +36,18 @@ function BookingForm({ onSubmit, onCancel })
     {
         e.preventDefault();
 
-        if (!onSubmit || loading) return;
+        if (!onSubmit || submitting || parentLoading) return;
 
         try {
-            setLoading(true);
+            setSubmitting(true);
 
             await onSubmit({
                 ...formData,
                 attendance: Number(formData.attendance),
                 durationPeriods: Number(formData.durationPeriods),
+                roomTypes: parseList(formData.roomTypes),
+                needs: parseList(formData.needs),
+                mandatoryGroupIds: parseList(formData.mandatoryGroupIds),
                 windows: [
                     {
                         date: formData.date,
@@ -50,10 +56,16 @@ function BookingForm({ onSubmit, onCancel })
                 ],
             });
         } finally {
-            setLoading(false);
+            setSubmitting(false);
         }
     };
 
+    const parseList = (value) =>
+        (Array.isArray(value) ? value : String(value || "").split(","))
+            .map((item) => item.trim())
+            .filter(Boolean);
+
+    const isLoading = submitting || parentLoading;
     const inputClass =
         "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500";
 
@@ -204,6 +216,50 @@ function BookingForm({ onSubmit, onCancel })
                 </div>
             </div>
 
+            <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                        Suitable Room Types
+                    </label>
+                    <input
+                        name="roomTypes"
+                        value={Array.isArray(formData.roomTypes) ? formData.roomTypes.join(", ") : formData.roomTypes}
+                        onChange={handleChange}
+                        placeholder="e.g. seminar_hall, auditorium"
+                        className={inputClass}
+                    />
+                    <p className="mt-1 text-xs text-slate-500">Separate multiple types with commas.</p>
+                </div>
+
+                <div>
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                        Facilities and Needs
+                    </label>
+                    <input
+                        name="needs"
+                        value={Array.isArray(formData.needs) ? formData.needs.join(", ") : formData.needs}
+                        onChange={handleChange}
+                        placeholder="e.g. projector, pa_system, accessible"
+                        className={inputClass}
+                    />
+                    <p className="mt-1 text-xs text-slate-500">Separate multiple needs with commas.</p>
+                </div>
+            </div>
+
+            <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Mandatory Student Group IDs (Optional)
+                </label>
+                <input
+                    name="mandatoryGroupIds"
+                    value={Array.isArray(formData.mandatoryGroupIds) ? formData.mandatoryGroupIds.join(", ") : formData.mandatoryGroupIds}
+                    onChange={handleChange}
+                    placeholder="e.g. Y3-CSE-A, Y3-CSE-B"
+                    className={inputClass}
+                />
+                <p className="mt-1 text-xs text-slate-500">Separate multiple group IDs with commas.</p>
+            </div>
+
             <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                     Additional Requirements
@@ -231,11 +287,11 @@ function BookingForm({ onSubmit, onCancel })
 
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={isLoading}
                     className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
                 >
                     <Send size={16} />
-                    {loading ? "Submitting..." : "Submit Booking"}
+                    {isLoading ? "Submitting..." : "Submit Booking"}
                 </button>
             </div>
         </form>

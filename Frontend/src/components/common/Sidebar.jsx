@@ -85,6 +85,9 @@ function Sidebar({ isOpen = true, onClose })
                             <p className="text-xs text-slate-400">
                                 Smart Campus Management
                             </p>
+                            <p className="text-[10px] leading-3 text-slate-400">
+                                Chilika Institute of Technology (CIT)
+                            </p>
                         </div>
                     </div>
 

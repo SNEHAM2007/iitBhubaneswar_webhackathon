@@ -1,5 +1,15 @@
 import api from "./api";
 
+// Turn an English or Hinglish venue request into an editable booking draft
+export const parseBookingRequest = async (text) => {
+  const response = await api.post(
+    "/bookings/parse",
+    { text },
+    { timeout: 35000 },
+  );
+  return response.data;
+};
+
 // Submit a new room booking request
 export const createBooking = async (bookingData) => {
   const response = await api.post("/bookings", bookingData);
