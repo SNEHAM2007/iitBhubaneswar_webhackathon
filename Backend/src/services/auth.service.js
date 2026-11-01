@@ -11,7 +11,9 @@ export const registerUser = async (data) => {
   });
 
   if (existingUser) {
-    throw new Error("Email is already registered. Please sign in instead.");
+    const error = new Error("Email is already registered. Please sign in instead.");
+    error.status = 409;
+    throw error;
   }
 
   // Hash password
@@ -50,13 +52,17 @@ export const loginUser = async ({ email, password }) => {
   });
 
   if (!user || !user.isActive) {
-    throw new Error("Invalid email or password");
+    const error = new Error("Invalid email or password");
+    error.status = 401;
+    throw error;
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
   if (!isPasswordValid) {
-    throw new Error("Invalid email or password");
+    const error = new Error("Invalid email or password");
+    error.status = 401;
+    throw error;
   }
 
   const token = generateToken(user);
