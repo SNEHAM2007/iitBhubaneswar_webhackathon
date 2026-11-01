@@ -20,11 +20,14 @@ import assistantRoutes from "./routes/assistant.routes.js";
 const app = express();
 
 // Allowed frontend origins
-const allowedOrigins = (
-  process.env.FRONTEND_URL || "http://localhost:5173"
-)
-  .split(",")
-  .map((origin) => origin.trim().replace(/\/$/, ""));
+const allowedOrigins = new Set([
+  ...(process.env.FRONTEND_URL || "")
+    .split(",")
+    .map((origin) => origin.trim().replace(/\/$/, ""))
+    .filter(Boolean),
+  "http://localhost:5173",
+  "https://campusflow-frontend-43qu.onrender.com",
+]);
 
 // CORS configuration
 app.use(
@@ -35,7 +38,7 @@ app.use(
         return callback(null, true);
       }
 
-      if (allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+      if (allowedOrigins.has(origin.replace(/\/$/, ""))) {
         return callback(null, true);
       }
 
