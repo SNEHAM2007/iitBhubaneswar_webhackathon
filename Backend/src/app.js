@@ -6,7 +6,7 @@ import { prisma } from "./config/prisma.js";
 // ==================================
 // ROUTE IMPORTS
 // ==================================
-
+import bookingRoutes from "./routes/booking.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
@@ -105,6 +105,11 @@ app.use("/api/faculty", facultyRoutes);
 // ==================================
 
 app.use("/api/faculty-availability", facultyAvailabilityRoutes);
+// ==================================
+// BOOKING MANAGEMENT ROUTES
+// ==================================
+
+app.use("/api/bookings", bookingRoutes);
 
 // ==================================
 // 404 HANDLER

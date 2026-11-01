@@ -1,0 +1,243 @@
+{
+  "dataset_id": "cit-public-v1",
+  "schedule_dataset_id": "cit-public-v1",
+  "team": "Campus Scheduler",
+  "soft_penalties": {
+    "S1": 10,
+    "S2": 124,
+    "S3": 3,
+    "S4": 75,
+    "S5": 9,
+    "S6": 0
+  },
+  "soft_total": 221,
+  "exam_soft_penalty": 0,
+  "hard_violations": [
+    {
+      "rule": "H11",
+      "where": "timetable",
+      "detail": "Basket OEB-1 sessions are not at the same time: [('THU', 8), ('WED', 6), ('WED', 8)]"
+    },
+    {
+      "rule": "H11",
+      "where": "timetable",
+      "detail": "Basket OEB-2 sessions are not at the same time: [('MON', 2), ('TUE', 5), ('WED', 4)]"
+    },
+    {
+      "rule": "H11",
+      "where": "timetable",
+      "detail": "Basket OEB-3 sessions are not at the same time: [('FRI', 7), ('MON', 1), ('MON', 8)]"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-MA101 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-PH101 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CS101 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-HS101 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CS201 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CS202 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CS203 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CS204 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EC201 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EC202 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EC203 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EC204 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EE201 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EE202 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EE203 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EE204 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-ME201 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-ME202 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-ME203 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-ME204 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CE201 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CE202 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CE203 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CE204 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-HS201 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CS301 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CS302 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CS303 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EC301 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EC302 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EC303 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EE301 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EE302 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-EE303 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-ME301 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-ME302 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-ME303 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CE301 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CE302 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-CE303 not scheduled"
+    },
+    {
+      "rule": "E1",
+      "where": "exams",
+      "detail": "EX-OE-BASKET not scheduled"
+    }
+  ],
+  "hard_violation_count": 44,
+  "hard_by_rule": {
+    "H11": 3,
+    "E1": 41
+  },
+  "warnings": []
+}
