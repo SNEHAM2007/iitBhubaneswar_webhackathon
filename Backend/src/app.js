@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { prisma } from "./config/prisma.js";
+
 import bookingRoutes from "./routes/booking.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
@@ -17,17 +18,37 @@ import assistantRoutes from "./routes/assistant.routes.js";
 
 const app = express();
 
-// Middleware
+// Allowed frontend origins
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/$/, ""));
+
+// CORS configuration
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Allow requests without an Origin header (health checks, etc.)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+        return callback(null, true);
+      }
+
+      console.error("CORS blocked origin:", origin);
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/faculty-accounts", facultyAccountRoutes);
@@ -42,7 +63,7 @@ app.use("/api/exams", examRoutes);
 app.use("/api/rescheduling", reschedulingRoutes);
 app.use("/api/assistant", assistantRoutes);
 
-// Health check API
+// Health check
 app.get("/api/health", async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
