@@ -27,11 +27,27 @@ export const register = async (req, res) => {
     if (
       error.message.includes("required") ||
       error.message.includes("Password must") ||
-      error.message.includes("Invalid registration role")
+      error.message.includes("Invalid registration role") ||
+      error.message.includes("does not exist")
     ) {
       return res.status(400).json({
         success: false,
         message: error.message,
+      });
+    }
+
+    // Prisma foreign-key / unique-constraint errors
+    if (error.code === "P2002") {
+      return res.status(409).json({
+        success: false,
+        message: "Email is already registered. Please sign in instead.",
+      });
+    }
+
+    if (error.code === "P2003") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid department code. Please select a valid department.",
       });
     }
 

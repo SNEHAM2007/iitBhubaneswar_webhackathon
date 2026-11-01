@@ -34,14 +34,30 @@ export const registerUser = async (data) => {
     throw new Error("Invalid registration role");
   }
 
+  // Validate department exists when provided (foreign key constraint)
+  const normalizedDeptCode =
+    departmentCode && ["FACULTY", "COORDINATOR"].includes(userRole)
+      ? departmentCode.trim().toUpperCase()
+      : null;
+
+  if (normalizedDeptCode) {
+    const department = await prisma.department.findUnique({
+      where: { code: normalizedDeptCode },
+    });
+
+    if (!department) {
+      throw new Error(
+        `Department "${normalizedDeptCode}" does not exist. Please contact an administrator.`
+      );
+    }
+  }
+
   const user = await prisma.user.create({
     data: {
       name: name.trim(),
       email: normalizedEmail,
       passwordHash,
-      departmentCode: departmentCode
-        ? departmentCode.trim().toUpperCase()
-        : null,
+      departmentCode: normalizedDeptCode,
       role: userRole,
       isActive: true,
     },
