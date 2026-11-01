@@ -1,5 +1,21 @@
 # React + Vite
 
+## Running the scheduling feature
+
+Start the services in separate terminals:
+
+1. Start the Python scheduler from `scheduler` with
+   `.\venv\Scripts\Activate.ps1` and
+   `uvicorn app.main:app --reload --port 8001`.
+2. Start the Node API from `Backend` with `npm run dev`.
+3. Start this frontend with `npm run dev`, then sign in and open **Timetable**.
+
+The timetable page calls the authenticated Node endpoint at
+`POST /api/scheduling/generate`. The Node API forwards the request to the
+scheduler at `http://localhost:8001` by default. Set `SCHEDULER_URL` in the
+backend environment if the scheduler runs elsewhere. The response includes
+the generated session assignments and is rendered in the timetable grid.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

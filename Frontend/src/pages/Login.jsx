@@ -1,189 +1,163 @@
-
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  CalendarDays,
-  LockKeyhole,
-  Mail,
-  GraduationCap,
-} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+
+import AuthLayout from "../components/auth/AuthLayout";
 import { useAuth } from "../context/AuthContext";
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+const dashboardRoutes = {
+    ADMIN: "/admin",
+    FACULTY: "/faculty",
+    COORDINATOR: "/coordinator",
+    CLUB_REP: "/club",
+};
 
-  const navigate = useNavigate();
-  const { login, loading } = useAuth();
+function Login()
+{
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+    const navigate = useNavigate();
+    const { login, loading } = useAuth();
 
-    if (!email.trim() || !password) {
-      setError("Please enter your email and password.");
-      return;
-    }
+    const handleSubmit = async (event) =>
+    {
+        event.preventDefault();
+        setError("");
 
-    try {
-      const loggedInUser = await login({
-        email: email.trim(),
-        password,
-      });
+        try
+        {
+            const loggedInUser = await login({
+                email: email.trim(),
+                password,
+            });
+            const destination = dashboardRoutes[loggedInUser.role?.toUpperCase()];
 
-      const role = loggedInUser.role?.toUpperCase();
+            if (!destination)
+            {
+                setError("Your account does not have a valid dashboard role.");
+                return;
+            }
 
-      const dashboardRoutes = {
-        ADMIN: "/admin",
-        FACULTY: "/faculty",
-        COORDINATOR: "/coordinator",
-        CLUB_REP: "/club",
-      };
+            navigate(destination, { replace: true });
+        }
+        catch (requestError)
+        {
+            setError(
+                requestError.response?.data?.message ||
+                requestError.message ||
+                "Login failed. Please check your credentials."
+            );
+        }
+    };
 
-      const destination = dashboardRoutes[role];
-
-      if (!destination) {
-        setError("Your account does not have a valid dashboard role.");
-        return;
-      }
-
-      navigate(destination, { replace: true });
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        err.message ||
-        "Login failed. Please check your credentials."
-      );
-    }
-  };
-
-  return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-slate-50">
-      {/* Left section */}
-      <div className="hidden lg:flex flex-col justify-between bg-indigo-700 p-12 text-white">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-white/15 p-3">
-            <CalendarDays size={28} />
-          </div>
-          <span className="text-2xl font-bold">Campus Scheduler</span>
-        </div>
-
-        <div className="max-w-lg">
-          <div className="mb-6 inline-flex rounded-full bg-white/15 px-4 py-2 text-sm">
-            Smart Campus Management
-          </div>
-
-          <h1 className="text-5xl font-bold leading-tight">
-            Plan smarter.
-            <br />
-            Schedule better.
-          </h1>
-
-          <p className="mt-6 text-lg leading-8 text-indigo-100">
-            Manage classrooms, faculty schedules, examinations and campus
-            bookings through one intelligent platform.
-          </p>
-        </div>
-
-        <p className="text-sm text-indigo-200">
-          © 2026 Campus Scheduler. All rights reserved.
-        </p>
-      </div>
-
-      {/* Right section */}
-      <div className="flex items-center justify-center p-6 sm:p-10">
-        <div className="w-full max-w-md">
-          <div className="mb-8 text-center lg:text-left">
-            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700 lg:mx-0">
-              <GraduationCap size={30} />
-            </div>
-
-            <h2 className="text-3xl font-bold text-slate-900">
-              Welcome back
-            </h2>
-
-            <p className="mt-2 text-slate-500">
-              Sign in to access your campus workspace.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Email address
-              </label>
-
-              <div className="flex items-center rounded-xl border border-slate-200 bg-white px-4 focus-within:border-indigo-500">
-                <Mail size={19} className="text-slate-400" />
-
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@college.edu"
-                  className="w-full border-0 bg-transparent px-3 py-3.5 outline-none"
-                  autoComplete="email"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Password
-              </label>
-
-              <div className="flex items-center rounded-xl border border-slate-200 bg-white px-4 focus-within:border-indigo-500">
-                <LockKeyhole size={19} className="text-slate-400" />
-
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full border-0 bg-transparent px-3 py-3.5 outline-none"
-                  autoComplete="current-password"
-                  required
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((previous) => !previous)}
-                  className="text-xs font-semibold text-indigo-600"
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
+    return (
+        <AuthLayout pageLabel="CAMPUS WORKSPACE">
+            <div className="mb-7 mt-3">
+                <h2 className="text-3xl font-bold tracking-tight text-slate-950">
+                    Welcome back
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                    Sign in to continue to your campus workspace.
+                </p>
             </div>
 
             {error && (
-              <div
-                role="alert"
-                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
-              >
-                {error}
-              </div>
+                <div
+                    role="alert"
+                    className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                    {error}
+                </div>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl bg-indigo-600 py-3.5 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
-          </form>
+            <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                    <label
+                        htmlFor="login-email"
+                        className="mb-2 block text-sm font-semibold text-slate-700"
+                    >
+                        Email address
+                    </label>
+                    <div className="flex items-center rounded-xl border border-slate-200 bg-white px-3.5 transition focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10">
+                        <Mail size={18} className="shrink-0 text-slate-400" />
+                        <input
+                            id="login-email"
+                            type="email"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            placeholder="you@college.edu"
+                            className="min-w-0 flex-1 bg-transparent px-3 py-3.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                            autoComplete="email"
+                            autoCapitalize="none"
+                            required
+                        />
+                    </div>
+                </div>
 
-          <p className="mt-8 text-center text-xs text-slate-400">
-            Secure access for administrators, faculty, coordinators and club
-            representatives.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+                <div>
+                    <div className="mb-2 flex items-center justify-between">
+                        <label
+                            htmlFor="login-password"
+                            className="text-sm font-semibold text-slate-700"
+                        >
+                            Password
+                        </label>
+                    </div>
+                    <div className="flex items-center rounded-xl border border-slate-200 bg-white px-3.5 transition focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10">
+                        <LockKeyhole size={18} className="shrink-0 text-slate-400" />
+                        <input
+                            id="login-password"
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            placeholder="Enter your password"
+                            className="min-w-0 flex-1 bg-transparent px-3 py-3.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                            autoComplete="current-password"
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword((previous) => !previous)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                        >
+                            {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    {loading ? "Signing you in..." : "Sign in"}
+                    {!loading && <ArrowRight size={17} />}
+                </button>
+            </form>
+
+            <div className="my-7 flex items-center gap-3">
+                <span className="h-px flex-1 bg-slate-200" />
+                <span className="text-xs text-slate-400">New to Campus Scheduler?</span>
+                <span className="h-px flex-1 bg-slate-200" />
+            </div>
+
+            <Link
+                to="/register"
+                className="flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+            >
+                Create a faculty account
+            </Link>
+
+            <p className="mt-5 text-center text-xs leading-5 text-slate-500">
+                Sign-in access for all four roles. Your dashboard is selected
+                automatically from your account.
+            </p>
+        </AuthLayout>
+    );
 }
 
 export default Login;

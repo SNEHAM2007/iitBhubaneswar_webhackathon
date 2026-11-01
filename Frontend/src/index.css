@@ -1,6 +1,7 @@
 
 @import "tailwindcss";
 
+@layer base {
 /* =================================
    CAMPUS SCHEDULER DESIGN SYSTEM
 ================================= */
@@ -199,4 +200,5 @@ a {
   .page-title {
     font-size: 22px;
   }
+}
 }

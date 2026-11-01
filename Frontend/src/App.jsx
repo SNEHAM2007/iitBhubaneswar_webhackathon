@@ -8,6 +8,7 @@ import
   } from "react-router-dom";
 
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Unauthorized from "./pages/Unauthorized";
 
 import ProtectedRoute from "./components/common/ProtectedRoute";
@@ -15,7 +16,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import FacultyDashboard from "./pages/faculty/FacultyDashBoard";
-import CoordinatorDashboard from "./pages/coordinator/CoordinatorDashboard";
+import CoordinatorDashboard from "./pages/coordinate/CoordinatorDashboard";
 import ClubDashboard from "./pages/club/ClubDashboard";
 
 import Timetable from "./pages/Timetable";
@@ -32,6 +33,7 @@ function App()
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Admin */}

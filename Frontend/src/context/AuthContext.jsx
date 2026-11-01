@@ -7,6 +7,7 @@ import {
 
 import {
   loginUser,
+  registerUser,
   logoutUser,
   getCurrentUser,
   isAuthenticated,
@@ -38,6 +39,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (details) => {
+    try {
+      setLoading(true);
+
+      const response = await registerUser(details);
+      const registeredUser = response.user || response.data?.user;
+
+      if (!registeredUser) {
+        throw new Error("User information was not returned by the server");
+      }
+
+      setUser(registeredUser);
+
+      return registeredUser;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     logoutUser();
     setUser(null);
@@ -48,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     isAuthenticated: Boolean(user && isAuthenticated()),
     login,
+    register,
     logout,
   };
 
