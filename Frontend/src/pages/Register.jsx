@@ -9,6 +9,7 @@ import {
     GraduationCap,
     LockKeyhole,
     Mail,
+    Shield,
     Sparkles,
     UserRound,
     Users,
