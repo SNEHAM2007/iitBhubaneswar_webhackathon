@@ -1,3 +1,4 @@
+
 import { registerUser, loginUser } from "../services/auth.service.js";
 
 export const register = async (req, res) => {
@@ -9,6 +10,7 @@ export const register = async (req, res) => {
       message: "Registration successful",
       ...result,
     });
+
   } catch (error) {
     console.error("REGISTER ERROR:", error);
 
@@ -22,12 +24,24 @@ export const register = async (req, res) => {
       });
     }
 
+    if (
+      error.message.includes("required") ||
+      error.message.includes("Password must") ||
+      error.message.includes("Invalid registration role")
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
     return res.status(500).json({
       success: false,
-      message: "Registration failed",
+      message: "Registration failed. Please try again.",
     });
   }
 };
+
 export const login = async (req, res) => {
   try {
     const result = await loginUser(req.body);
@@ -37,10 +51,14 @@ export const login = async (req, res) => {
       message: "Login successful",
       ...result,
     });
+
   } catch (error) {
     console.error("LOGIN ERROR:", error);
 
-    if (error.message === "Invalid email or password") {
+    if (
+      error.message === "Invalid email or password" ||
+      error.message === "Email and password are required"
+    ) {
       return res.status(401).json({
         success: false,
         message: error.message,
