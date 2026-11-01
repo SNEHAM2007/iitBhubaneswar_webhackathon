@@ -9,7 +9,6 @@ import {
     GraduationCap,
     LockKeyhole,
     Mail,
-    Shield,
     Sparkles,
     UserRound,
     Users,
@@ -36,12 +35,6 @@ const ROLES = [
         label: "Club Rep",
         description: "Book venues for fest & club events",
         icon: Sparkles,
-    },
-    {
-        id: "ADMIN",
-        label: "Admin",
-        description: "Full campus scheduler management",
-        icon: Shield,
     },
 ];
 
@@ -73,9 +66,9 @@ function Register()
         event.preventDefault();
         setError("");
 
-        if (password.length < 6)
+        if (password.length < 8)
         {
-            setError("Password must be at least 6 characters long.");
+            setError("Password must be at least 8 characters long.");
             return;
         }
 
@@ -92,7 +85,9 @@ function Register()
                 email: email.trim().toLowerCase(),
                 password,
                 role,
-                ...(departmentCode ? { departmentCode: departmentCode.toUpperCase() } : {}),
+                ...(( role === "FACULTY" || role === "COORDINATOR") && departmentCode
+                    ? { departmentCode: departmentCode.toUpperCase() }
+                    : {}),
             });
 
             setSuccess(true);
@@ -270,7 +265,7 @@ function Register()
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
-                                placeholder="At least 6 characters"
+                                placeholder="At least 8 characters"
                                 minLength={6}
                                 maxLength={72}
                                 autoComplete="new-password"

@@ -5,9 +5,9 @@ export const registerSchema = z.object({
 
   email: z.string().trim().email().toLowerCase(),
 
-  password: z.string().min(6).max(72),
+  password: z.string().min(8).max(72),
 
-  role: z.enum(["FACULTY", "COORDINATOR", "CLUB_REP", "ADMIN"]).optional(),
+  role: z.enum(["FACULTY", "COORDINATOR", "CLUB_REP"]).optional(),
 
   departmentCode: z.string().trim().optional(),
 });
