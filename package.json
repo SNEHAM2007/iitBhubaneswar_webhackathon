@@ -1,0 +1,13 @@
+{
+  "name": "campus-scheduling-system",
+  "version": "1.0.0",
+  "description": "Comprehensive Campus Scheduling and Timetable Optimization System",
+  "scripts": {
+    "start:backend": "cd Backend && npm run dev",
+    "start:frontend": "cd Frontend && npm run dev",
+    "start:scheduler": "cd scheduler && .\\venv\\Scripts\\uvicorn.exe app.main:app --host 0.0.0.0 --port 8001 --reload",
+    "seed": "cd Backend && node src/scripts/seedUsersAndSchedule.js",
+    "validate": "python validator.py --data CrunchWeek_StarterPack\\data\\cit_public.json --schedule exports\\schedule.json",
+    "test:api": "cd Backend && node src/scripts/testEndpoints.js"
+  }
+}

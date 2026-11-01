@@ -1,11 +1,6 @@
-
 import express from "express";
 import cors from "cors";
 import { prisma } from "./config/prisma.js";
-
-// ==================================
-// ROUTE IMPORTS
-// ==================================
 import bookingRoutes from "./routes/booking.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
@@ -13,130 +8,60 @@ import departmentRoutes from "./routes/department.routes.js";
 import facultyRoutes from "./routes/faculty.routes.js";
 import facultyAvailabilityRoutes from "./routes/facultyAvailability.routes.js";
 import facultyAccountRoutes from "./routes/facultyAccount.routes.js";
-
-// ==================================
-// EXPRESS APP
-// ==================================
+import schedulingRoutes from "./routes/scheduling.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
+import roomRoutes from "./routes/room.routes.js";
+import examRoutes from "./routes/exam.routes.js";
+import reschedulingRoutes from "./routes/rescheduling.routes.js";
+import assistantRoutes from "./routes/assistant.routes.js";
 
 const app = express();
 
-// ==================================
-// MIDDLEWARE
-// ==================================
-
+// Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
   }),
 );
 
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ==================================
-// ROOT API
-// ==================================
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/admin/faculty-accounts", facultyAccountRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/faculty", facultyRoutes);
+app.use("/api/faculty-availability", facultyAvailabilityRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/scheduling", schedulingRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/rooms", roomRoutes);
+app.use("/api/exams", examRoutes);
+app.use("/api/rescheduling", reschedulingRoutes);
+app.use("/api/assistant", assistantRoutes);
 
-app.get("/", (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Welcome to Campus Scheduler API",
-  });
-});
-
-// ==================================
-// HEALTH CHECK
-// ==================================
-
+// Health check API
 app.get("/api/health", async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Campus Scheduler API is running",
       database: "Connected",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Database health check failed:", error);
+    console.error("Health check failed:", error);
 
-    return res.status(503).json({
+    res.status(500).json({
       success: false,
-      message: "Database connection failed",
+      message: "API is running, but database connection failed",
       database: "Disconnected",
     });
   }
 });
-
-// ==================================
-// AUTHENTICATION ROUTES
-// ==================================
-
-app.use("/api/auth", authRoutes);
-
-// ==================================
-// ADMIN ROUTES
-// ==================================
-
-app.use("/api/admin", adminRoutes);
-
-// ==================================
-// FACULTY ACCOUNT MANAGEMENT ROUTES
-// ==================================
-
-app.use("/api/admin/faculty-accounts", facultyAccountRoutes);
-
-// ==================================
-// DEPARTMENT ROUTES
-// ==================================
-
-app.use("/api/departments", departmentRoutes);
-
-// ==================================
-// FACULTY ROUTES
-// ==================================
-
-app.use("/api/faculty", facultyRoutes);
-
-// ==================================
-// FACULTY AVAILABILITY ROUTES
-// ==================================
-
-app.use("/api/faculty-availability", facultyAvailabilityRoutes);
-// ==================================
-// BOOKING MANAGEMENT ROUTES
-// ==================================
-
-app.use("/api/bookings", bookingRoutes);
-
-// ==================================
-// 404 HANDLER
-// ==================================
-
-app.use((req, res) => {
-  return res.status(404).json({
-    success: false,
-    message: `Route not found: ${req.originalUrl}`,
-  });
-});
-
-// ==================================
-// GLOBAL ERROR HANDLER
-// ==================================
-
-app.use((error, req, res, next) => {
-  console.error("Global API Error:", error);
-
-  return res.status(error.status || 500).json({
-    success: false,
-    message: error.message || "Internal server error",
-  });
-});
-
-// ==================================
-// EXPORT APP
-// ==================================
 
 export default app;

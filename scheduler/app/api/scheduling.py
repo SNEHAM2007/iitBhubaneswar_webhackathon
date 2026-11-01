@@ -1,11 +1,12 @@
-
 from pathlib import Path
+import json
 
 from fastapi import APIRouter, HTTPException
 
 from app.models.schedule import SchedulingRequest
 from app.solvers.timetable_solver import generate_timetable
 from app.solvers.exam_solver import generate_exam_timetable
+from app.solvers.reschedule_solver import reschedule_timetable
 from app.data.dataset_loader import load_dataset
 from app.data.dataset_mapper import map_dataset_to_request
 from app.exporters.schedule_exporter import export_schedule
@@ -18,6 +19,80 @@ router = APIRouter(
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 EXPORT_PATH = PROJECT_ROOT / "exports" / "schedule.json"
+EXPORT_AFTER_PATH = PROJECT_ROOT / "exports" / "schedule_after.json"
+
+PERIOD_TIMES = {
+    1: ("08:00", "09:00"),
+    2: ("09:00", "10:00"),
+    3: ("10:00", "11:00"),
+    4: ("11:00", "12:00"),
+    5: ("12:00", "13:00"),
+    6: ("14:00", "15:00"),
+    7: ("15:00", "16:00"),
+    8: ("16:00", "17:00"),
+    9: ("17:00", "18:00"),
+}
+
+DAY_NAMES = {
+    "MON": "Monday",
+    "TUE": "Tuesday",
+    "WED": "Wednesday",
+    "THU": "Thursday",
+    "FRI": "Friday",
+    "SAT": "Saturday",
+}
+
+
+def build_timetable_from_assignments(assignments, data):
+    sessions_by_id = {s["id"]: s for s in data["sessions"]}
+    courses_by_id = {c["id"]: c for c in data["courses"]}
+    faculty_by_id = {f["id"]: f for f in data["faculty"]}
+    rooms_by_id = {r["id"]: r for r in data["rooms"]}
+    groups_by_id = {g["id"]: g for g in data["student_groups"]}
+
+    timetable = []
+    for item in assignments:
+        session_id = item.get("session_id")
+        session = sessions_by_id.get(session_id)
+        if not session:
+            continue
+
+        day_code = item.get("day")
+        start_period = item.get("start_period")
+        duration = session.get("duration", 1)
+        end_period = start_period + duration - 1
+
+        start_time = PERIOD_TIMES.get(start_period, ("08:00", "09:00"))[0]
+        end_time = PERIOD_TIMES.get(end_period, ("09:00", "10:00"))[1]
+
+        course = courses_by_id.get(session["course_id"], {})
+        group_ids = session.get("groups", [])
+        primary_group = groups_by_id.get(group_ids[0], {}) if group_ids else {}
+        faculty_member = faculty_by_id.get(session.get("faculty_id"), {})
+        room_id = item.get("room_id")
+        room = rooms_by_id.get(room_id, {})
+
+        timetable.append({
+            "id": session["id"],
+            "day": DAY_NAMES.get(day_code, day_code),
+            "startTime": start_time,
+            "time": f"{start_time} - {end_time}",
+            "subject": course.get("title", session["course_id"]),
+            "courseCode": session["course_id"],
+            "faculty": faculty_member.get("name", session.get("faculty_id", "")),
+            "roomId": room_id,
+            "room": room.get("name", room_id),
+            "department": primary_group.get("department", course.get("department", "")),
+            "year": primary_group.get("year", course.get("year", 1)),
+            "groups": [
+                groups_by_id.get(gid, {}).get("name", gid)
+                for gid in group_ids
+            ],
+            "kind": session.get("kind", "lecture"),
+            "duration": duration,
+        })
+
+    return timetable
 
 
 # Existing endpoint: manually supplied scheduling data
@@ -43,6 +118,42 @@ def preview_schedule(request: SchedulingRequest):
             status_code=500,
             detail="Internal scheduling error"
         )
+
+
+# Retrieve current generated schedule
+@router.get("/latest")
+def get_latest_schedule():
+    try:
+        if not EXPORT_PATH.exists():
+            return {
+                "success": True,
+                "has_schedule": False,
+                "timetable": [],
+                "exams": [],
+                "message": "No schedule generated yet"
+            }
+
+        with open(EXPORT_PATH, "r", encoding="utf-8") as f:
+            export_data = json.load(f)
+
+        data = load_dataset()
+        timetable = build_timetable_from_assignments(export_data.get("sessions", []), data)
+
+        return {
+            "success": True,
+            "has_schedule": True,
+            "dataset_id": export_data.get("dataset_id"),
+            "team": export_data.get("team"),
+            "generated_at": export_data.get("generated_at"),
+            "total_sessions": len(timetable),
+            "total_exams": len(export_data.get("exams", [])),
+            "timetable": timetable,
+            "exams": export_data.get("exams", [])
+        }
+
+    except Exception as error:
+        print("Error fetching latest schedule:", error)
+        raise HTTPException(status_code=500, detail=str(error))
 
 
 # Generate timetable using the official CIT dataset
@@ -94,6 +205,59 @@ def generate_from_dataset():
             team="Campus Scheduler"
         )
 
+        sessions_by_id = {
+            session["id"]: session
+            for session in data["sessions"]
+        }
+        courses_by_id = {
+            course["id"]: course
+            for course in data["courses"]
+        }
+        faculty_by_id = {
+            member["id"]: member
+            for member in data["faculty"]
+        }
+        rooms_by_id = {
+            room["id"]: room
+            for room in data["rooms"]
+        }
+        groups_by_id = {
+            group["id"]: group
+            for group in data["student_groups"]
+        }
+        slots_by_id = {
+            slot.id: slot
+            for slot in request.slots
+        }
+        timetable = []
+
+        for assignment in result["scheduled_sessions"]:
+            session = sessions_by_id[assignment["session_id"]]
+            start_slot = slots_by_id[assignment["slot_ids"][0]]
+            end_slot = slots_by_id[assignment["slot_ids"][-1]]
+            group = groups_by_id[session["groups"][0]]
+            course = courses_by_id[session["course_id"]]
+
+            timetable.append({
+                "id": session["id"],
+                "day": DAY_NAMES.get(start_slot.day, start_slot.day),
+                "startTime": start_slot.start_time,
+                "time": f"{start_slot.start_time} - {end_slot.end_time}",
+                "subject": course["title"],
+                "courseCode": session["course_id"],
+                "faculty": faculty_by_id[session["faculty_id"]]["name"],
+                "roomId": assignment["room_id"],
+                "room": rooms_by_id[assignment["room_id"]]["name"],
+                "department": group["department"],
+                "year": group["year"],
+                "groups": [
+                    groups_by_id[group_id]["name"]
+                    for group_id in session["groups"]
+                ],
+                "kind": session["kind"],
+                "duration": len(assignment["slot_ids"]),
+            })
+
         return {
             "success": True,
             "dataset_id": data["dataset_id"],
@@ -101,6 +265,8 @@ def generate_from_dataset():
             "total_exams": exam_result["total_exams"],
             "solver_status": result["solver_status"],
             "exam_status": exam_result["message"],
+            "timetable": timetable,
+            "exams": exam_result["exams"],
             "export": export_result
         }
 

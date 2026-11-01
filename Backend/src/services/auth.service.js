@@ -3,7 +3,7 @@ import { prisma } from "../config/prisma.js";
 import { generateToken } from "../utils/generateToken.js";
 
 export const registerUser = async (data) => {
-  const { name, email, password, departmentCode } = data;
+  const { name, email, password, departmentCode, role } = data;
 
   // Check existing user
   const existingUser = await prisma.user.findUnique({
@@ -11,20 +11,22 @@ export const registerUser = async (data) => {
   });
 
   if (existingUser) {
-    throw new Error("Email is already registered");
+    throw new Error("Email is already registered. Please sign in instead.");
   }
 
   // Hash password
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await bcrypt.hash(password, 10);
 
-  // Create user with default role
+  const userRole = (role || "FACULTY").toUpperCase();
+
+  // Create user
   const user = await prisma.user.create({
     data: {
       name,
       email,
       passwordHash,
-      departmentCode: departmentCode || null,
-      role: "FACULTY",
+      departmentCode: departmentCode ? departmentCode.toUpperCase() : null,
+      role: userRole,
       isActive: true,
     },
     select: {
@@ -51,10 +53,7 @@ export const loginUser = async ({ email, password }) => {
     throw new Error("Invalid email or password");
   }
 
-  const isPasswordValid = await bcrypt.compare(
-    password,
-    user.passwordHash
-  );
+  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
   if (!isPasswordValid) {
     throw new Error("Invalid email or password");

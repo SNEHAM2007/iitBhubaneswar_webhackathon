@@ -1,0 +1,47 @@
+[
+  {
+    "id": "REQ-DISRUPT-01",
+    "title": "Faculty Emergency Leave - F07",
+    "requester": "Prof. Vikram Sarabhai (F07)",
+    "department": "CSE",
+    "currentDate": "Monday",
+    "currentTime": "08:00 – 18:00 (P1–P9)",
+    "requestedDate": "Online / Make-up Slots",
+    "requestedTime": "Flexible across week",
+    "room": "CR-101 / CR-102",
+    "reason": "Conference travel every Monday for the rest of the semester",
+    "status": "PENDING",
+    "createdAt": "2026-11-01T02:41:06.007Z",
+    "disruptionType": "faculty_unavailable"
+  },
+  {
+    "id": "REQ-DISRUPT-02",
+    "title": "Room Maintenance - CR-102 Closed",
+    "requester": "Estate & Campus Maintenance",
+    "department": "Administration",
+    "currentDate": "Monday – Friday",
+    "currentTime": "Full Day (P1–P9)",
+    "requestedDate": "Alternative Classroom",
+    "requestedTime": "Match existing course schedule",
+    "room": "CR-102",
+    "reason": "Water leak, room closed for urgent structural repair",
+    "status": "PENDING",
+    "createdAt": "2026-11-01T02:41:06.016Z",
+    "disruptionType": "room_unavailable"
+  },
+  {
+    "id": "REQ-DISRUPT-03",
+    "title": "Add Tutorial Session - CS202-T2",
+    "requester": "Dr. P. Raman (F06)",
+    "department": "CSE",
+    "currentDate": "Not yet scheduled",
+    "currentTime": "Unassigned",
+    "requestedDate": "Wednesday or Thursday",
+    "requestedTime": "11:00 – 12:00 (P4)",
+    "room": "CR-103 or LH-1",
+    "reason": "Additional problem-solving tutorial required for CSE-2 cohort",
+    "status": "PENDING",
+    "createdAt": "2026-11-01T02:41:06.016Z",
+    "disruptionType": "add_session"
+  }
+]

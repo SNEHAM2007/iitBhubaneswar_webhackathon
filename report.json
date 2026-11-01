@@ -1,0 +1,28 @@
+{
+  "dataset_id": "cit-public-v1",
+  "schedule_dataset_id": "cit-public-v1",
+  "team": "Campus Scheduler",
+  "soft_penalties": {
+    "S1": 10,
+    "S2": 93,
+    "S3": 33,
+    "S4": 117,
+    "S5": 0,
+    "S6": 0
+  },
+  "soft_total": 253,
+  "bookings": {
+    "booking_score": 63.5,
+    "booking_score_max_if_all_approved": 70,
+    "approved": 20,
+    "alternatives": 3,
+    "rejected": 2,
+    "session_overrides": 0,
+    "priority_inversions": []
+  },
+  "exam_soft_penalty": 60,
+  "hard_violations": [],
+  "hard_violation_count": 0,
+  "hard_by_rule": {},
+  "warnings": []
+}

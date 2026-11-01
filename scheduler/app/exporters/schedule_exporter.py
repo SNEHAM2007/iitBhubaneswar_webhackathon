@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 from datetime import datetime, timezone
@@ -68,7 +67,6 @@ def export_schedule(
     exported_exams = []
 
     for exam in scheduled_exams:
-
         required_fields = [
             "exam_id",
             "day",
@@ -105,6 +103,9 @@ def export_schedule(
         "sessions": exported_sessions,
         "exams": exported_exams
     }
+
+    if "fest_week" in schedule and schedule["fest_week"]:
+        export_data["fest_week"] = schedule["fest_week"]
 
     # --------------------------------------------------
     # 4. Write JSON file
