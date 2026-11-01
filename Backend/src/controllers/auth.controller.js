@@ -10,13 +10,24 @@ export const register = async (req, res) => {
       ...result,
     });
   } catch (error) {
-    return res.status(400).json({
+    console.error("REGISTER ERROR:", error);
+
+    if (
+      error.message ===
+      "Email is already registered. Please sign in instead."
+    ) {
+      return res.status(409).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Registration failed",
     });
   }
 };
-
 export const login = async (req, res) => {
   try {
     const result = await loginUser(req.body);
@@ -27,9 +38,18 @@ export const login = async (req, res) => {
       ...result,
     });
   } catch (error) {
-    return res.status(401).json({
+    console.error("LOGIN ERROR:", error);
+
+    if (error.message === "Invalid email or password") {
+      return res.status(401).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Internal server error",
     });
   }
 };
