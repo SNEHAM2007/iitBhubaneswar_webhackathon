@@ -1,3 +1,4 @@
+
 import express from "express";
 import cors from "cors";
 import { prisma } from "./config/prisma.js";
@@ -19,7 +20,9 @@ import assistantRoutes from "./routes/assistant.routes.js";
 const app = express();
 
 // Allowed frontend origins
-const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+const allowedOrigins = (
+  process.env.FRONTEND_URL || "http://localhost:5173"
+)
   .split(",")
   .map((origin) => origin.trim().replace(/\/$/, ""));
 
@@ -42,7 +45,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  }),
+  })
 );
 
 app.use(express.json());
