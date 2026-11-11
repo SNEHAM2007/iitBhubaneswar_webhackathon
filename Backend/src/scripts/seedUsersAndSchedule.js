@@ -15,14 +15,6 @@ async function seed() {
   // 1. Seed demo accounts
   const demoUsers = [
     {
-      name: "Campus Administrator",
-      email: "admin@cit.edu",
-      password: "Admin@123",
-      role: "ADMIN",
-      departmentCode: null,
-      facultyId: null,
-    },
-    {
       name: "CSE Department Coordinator",
       email: "coordinator@cit.edu",
       password: "Coord@123",

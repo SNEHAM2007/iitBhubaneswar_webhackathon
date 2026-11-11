@@ -27,10 +27,9 @@ export const registerUser = async (data) => {
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  // Do not allow public registration as ADMIN
   const userRole = (role || "FACULTY").toUpperCase();
 
-  if (!["FACULTY", "COORDINATOR", "CLUB_REP"].includes(userRole)) {
+  if (!["FACULTY", "COORDINATOR", "CLUB_REP", "ADMIN"].includes(userRole)) {
     throw new Error("Invalid registration role");
   }
 

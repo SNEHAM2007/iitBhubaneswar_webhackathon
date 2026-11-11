@@ -18,8 +18,15 @@ router = APIRouter(
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-EXPORT_PATH = PROJECT_ROOT / "exports" / "schedule.json"
-EXPORT_AFTER_PATH = PROJECT_ROOT / "exports" / "schedule_after.json"
+# Fallback export paths if running in isolated container
+_base_dir = PROJECT_ROOT if (PROJECT_ROOT / "exports").exists() or (PROJECT_ROOT / "CrunchWeek_StarterPack").exists() else Path(".")
+EXPORT_PATH = _base_dir / "exports" / "schedule.json"
+EXPORT_AFTER_PATH = _base_dir / "exports" / "schedule_after.json"
+
+try:
+    EXPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
 
 PERIOD_TIMES = {
     1: ("08:00", "09:00"),

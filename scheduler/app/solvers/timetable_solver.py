@@ -333,7 +333,8 @@ def generate_timetable(request):
     # 8. Solve using OR-Tools CP-SAT
     # --------------------------------------------------
     solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = 60
+    solver.parameters.max_time_in_seconds = 120
+    solver.parameters.num_search_workers = 8
 
     status = solver.Solve(model)
 
@@ -344,9 +345,15 @@ def generate_timetable(request):
     print("========================================")
 
     if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        failure_message = "No feasible timetable could be generated"
+        if status == cp_model.UNKNOWN:
+            failure_message = (
+                "Solver timed out before finding a feasible timetable. "
+                "Consider increasing max_time_in_seconds."
+            )
         return {
             "success": False,
-            "message": "No feasible timetable could be generated",
+            "message": failure_message,
             "scheduled_sessions": [],
             "solver_status": solver.StatusName(status),
         }

@@ -2,14 +2,16 @@
 import json
 from pathlib import Path
 
+CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
-DEFAULT_DATASET_PATH = (
-    PROJECT_ROOT
-    / "CrunchWeek_StarterPack"
-    / "data"
-    / "cit_public.json"
-)
+POSSIBLE_DATASET_PATHS = [
+    CURRENT_DIR / "cit_public.json",
+    PROJECT_ROOT / "CrunchWeek_StarterPack" / "data" / "cit_public.json",
+    Path("CrunchWeek_StarterPack/data/cit_public.json"),
+    Path("/app/app/data/cit_public.json"),
+    Path("/app/cit_public.json"),
+]
 
 REQUIRED_KEYS = [
     "calendar",
@@ -23,11 +25,18 @@ REQUIRED_KEYS = [
 
 
 def load_dataset(file_path=None):
-    path = Path(file_path) if file_path else DEFAULT_DATASET_PATH
+    if file_path:
+        path = Path(file_path)
+    else:
+        path = None
+        for candidate in POSSIBLE_DATASET_PATHS:
+            if candidate.exists():
+                path = candidate
+                break
 
-    if not path.exists():
+    if not path or not path.exists():
         raise FileNotFoundError(
-            f"CIT dataset not found: {path}"
+            f"CIT dataset not found. Checked: {[str(p) for p in POSSIBLE_DATASET_PATHS]}"
         )
 
     with path.open("r", encoding="utf-8") as file:

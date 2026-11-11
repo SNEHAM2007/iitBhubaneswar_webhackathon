@@ -7,7 +7,7 @@ export const registerSchema = z.object({
 
   password: z.string().min(8).max(72),
 
-  role: z.enum(["FACULTY", "COORDINATOR", "CLUB_REP"]).optional(),
+  role: z.enum(["FACULTY", "COORDINATOR", "CLUB_REP", "ADMIN"]).optional(),
 
   departmentCode: z.string().trim().optional(),
 });

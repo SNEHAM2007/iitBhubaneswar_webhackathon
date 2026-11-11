@@ -37,6 +37,12 @@ const ROLES = [
         description: "Book venues for fest & club events",
         icon: Sparkles,
     },
+    {
+        id: "ADMIN",
+        label: "Admin",
+        description: "Manage campus operations",
+        icon: Shield,
+    },
 ];
 
 const DEPARTMENTS = [

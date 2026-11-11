@@ -197,14 +197,18 @@ def generate_exam_timetable(exams, rooms, exam_week):
     # --------------------------------------------------
 
     solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = 60
+    solver.parameters.max_time_in_seconds = 120
+    solver.parameters.num_search_workers = 8
 
     status = solver.Solve(model)
 
     if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        failure_message = "No feasible exam timetable found"
+        if status == cp_model.UNKNOWN:
+            failure_message = "Exam solver timed out before finding a feasible timetable."
         return {
             "success": False,
-            "message": "No feasible exam timetable found",
+            "message": failure_message,
             "exams": []
         }
 
