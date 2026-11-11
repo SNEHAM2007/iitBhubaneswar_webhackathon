@@ -38,7 +38,12 @@ app.use(
         return callback(null, true);
       }
 
-      if (allowedOrigins.has(origin.replace(/\/$/, ""))) {
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      if (
+        allowedOrigins.has(normalizedOrigin) ||
+        normalizedOrigin.endsWith(".onrender.com") ||
+        normalizedOrigin.includes("localhost")
+      ) {
         return callback(null, true);
       }
 

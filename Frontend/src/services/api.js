@@ -1,15 +1,16 @@
 
 import axios from "axios";
 
-const configuredApiUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
-const defaultApiUrl = import.meta.env.PROD
-  ? "https://iitbhubaneswar-webhackathon.onrender.com/api"
-  : "http://localhost:5000/api";
-const apiBaseUrl = configuredApiUrl
-  ? /\/api$/i.test(configuredApiUrl)
-    ? configuredApiUrl
-    : `${configuredApiUrl}/api`
-  : defaultApiUrl;
+const rawApiUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
+const isLocalhost = !rawApiUrl || rawApiUrl.includes("localhost") || rawApiUrl.includes("127.0.0.1");
+
+const apiBaseUrl = import.meta.env.PROD
+  ? (!isLocalhost && rawApiUrl
+      ? (rawApiUrl.endsWith("/api") ? rawApiUrl : `${rawApiUrl}/api`)
+      : "https://iitbhubaneswar-webhackathon.onrender.com/api")
+  : (rawApiUrl
+      ? (rawApiUrl.endsWith("/api") ? rawApiUrl : `${rawApiUrl}/api`)
+      : "http://localhost:5000/api");
 
 const api = axios.create({
   baseURL: apiBaseUrl,

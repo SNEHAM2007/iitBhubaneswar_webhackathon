@@ -7,8 +7,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const EXPORTS_PATH = path.resolve(__dirname, "../../../exports/schedule.json");
 
-const schedulerUrl = () =>
-  (process.env.SCHEDULER_URL || "http://localhost:8001").replace(/\/+$/, "");
+const schedulerUrl = () => {
+  const envUrl = process.env.SCHEDULER_URL?.trim();
+  if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
+    return envUrl.replace(/\/+$/, "");
+  }
+  if (process.env.NODE_ENV === "production" || process.env.RENDER) {
+    return "https://campusflow-scheduler.onrender.com";
+  }
+  return (envUrl || "http://localhost:8001").replace(/\/+$/, "");
+};
 
 const periodTimes = [
   { start: "08:00", end: "09:00" },
