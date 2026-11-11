@@ -29,6 +29,8 @@ services:
           type: web
           name: campusflow-scheduler
           property: host
+      - key: FRONTEND_URL
+        value: https://campusflow-frontend-43qu.onrender.com
       - key: JWT_SECRET
         generateValue: true
 
@@ -43,6 +45,9 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://iitbhubaneswar-webhackathon.onrender.com/api
 
 databases:
   # Managed PostgreSQL Database
